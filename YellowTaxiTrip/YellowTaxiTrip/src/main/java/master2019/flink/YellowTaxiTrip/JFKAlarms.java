@@ -24,19 +24,21 @@ public class JFKAlarms {
 
         // set up the execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-/*
+
         String inputPath = "";
         String outputPath = "";
         try {
-            inputPath = args[0];
-            outputPath = args[1];
+            inputPath = params.get("input");
+            outputPath = params.get("output");
         } catch (IndexOutOfBoundsException e) {
             System.out.println("Input file and output folder path must be provided.");
             return;
         }
- */
-        String inputPath = "/home/rodrigo/flink/assignment/YellowTaxiTrip/yellow_tripdata_2019_06.csv";
-        String outputPath = "/home/rodrigo/flink/assignment/YellowTaxiTrip/output/";
+
+        // If it is not an absolute path, make it absolute
+        if (params.get("input").charAt(0) != '/') inputPath = System.getProperty("user.dir") + "/" + inputPath;
+        if (params.get("output").charAt(0) != '/') outputPath = System.getProperty("user.dir") + "/" + outputPath;
+
         String	outFilePathJFK = outputPath +  "/jfk.csv";
         DataStream<String> source = env.readTextFile(inputPath).setParallelism(1);
 
@@ -60,7 +62,7 @@ public class JFKAlarms {
         });
 
         // emit result
-        taxiTrips.writeAsText(outFilePathJFK);
+        taxiTrips.writeAsText(outFilePathJFK, org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
 
         // execute program
         env.execute("JFK");

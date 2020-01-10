@@ -2,15 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bf17b8de-99a5-4aa9-8145-b6751116183d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/master2019/flink/YellowTaxiTrip/JFKAlarms.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/master2019/flink/YellowTaxiTrip/JFKAlarms.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/YellowTaxiTrip-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/YellowTaxiTrip-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/src/main/java/master2019/flink/YellowTaxiTrip/JFKAlarms.java" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/src/main/java/master2019/flink/YellowTaxiTrip/JFKAlarms.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/YellowTaxiTrip-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/YellowTaxiTrip-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/master2019/flink/YellowTaxiTrip/JFKAlarms.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/master2019/flink/YellowTaxiTrip/LargeTrips.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/YellowTaxiTrip-1.0-SNAPSHOT.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$3.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -95,7 +105,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
