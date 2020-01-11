@@ -13,14 +13,12 @@ import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExt
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 
-/**
- * In this class the JFK airport trips program has to be implemented.
- */
 public class JFKAlarms {
     public static void main(String[] args) throws Exception {
         System.out.println("Starting JFK Execution...");
@@ -29,8 +27,6 @@ public class JFKAlarms {
 
         // set up the execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
-        // env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
         // get input file path and output folder path
         String inputPath = "";
@@ -47,10 +43,10 @@ public class JFKAlarms {
         if (params.get("input").charAt(0) != '/') inputPath = System.getProperty("user.dir") + "/" + inputPath;
         if (params.get("output").charAt(0) != '/') outputPath = System.getProperty("user.dir") + "/" + outputPath;
 
-        String outFilePathJFK = outputPath + "/jfk.csv";
+        String outFilePathJFK = outputPath + "/jfkAlarms.csv";
         DataStream<String> source = env.readTextFile(inputPath);
 
-        SingleOutputStreamOperator<Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>>
+        SingleOutputStreamOperator<Tuple4<Integer, String, String, Integer>>
                 taxiTrips = source.filter(new FilterFunction<String>() {
             @Override
             // Filter trips that do not end at JFK airport and have less than two passengers.
@@ -76,7 +72,17 @@ public class JFKAlarms {
                 // Assigns a Timestamp in order to use time windows
                 return input.f1.atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli();
             }
-        }).keyBy(0).window(TumblingEventTimeWindows.of(Time.hours(1))).reduce(new SummingReducer());
+        }).keyBy(0).window(TumblingEventTimeWindows.of(Time.hours(1))).reduce(new SummingReducer())
+        .map(new MapFunction<Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>, Tuple4<Integer, String, String, Integer>>() {
+            @Override
+            // Just to format the dates to match the PDF output
+            public Tuple4<Integer, String, String, Integer> map(Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> value) {
+                //  Pattern: 2019-06-01 00:55:13
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                return new Tuple4<Integer, String, String, Integer>
+                        (value.f0, value.f1.format(formatter), value.f2.format(formatter), value.f3);
+            }
+        });
 
         // emit result
         taxiTrips.writeAsCsv(outFilePathJFK, org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE).setParallelism(1);

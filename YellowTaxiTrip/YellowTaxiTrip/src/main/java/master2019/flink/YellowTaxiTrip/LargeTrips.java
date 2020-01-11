@@ -18,9 +18,7 @@ import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 
-/**
- * In this class the Large trips program has to be implemented
- */
+
 public class LargeTrips {
     public static void main(String[] args) throws Exception {
         System.out.println("Starting Large Trips Execution...");
@@ -29,8 +27,6 @@ public class LargeTrips {
 
         // set up the execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
-        // env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
         // get input file path and output folder path
         String inputPath = "";
@@ -50,7 +46,7 @@ public class LargeTrips {
         String outFilePathLargeTrips = outputPath + "/largeTrips.csv";
         DataStream<String> source = env.readTextFile(inputPath);
 
-        SingleOutputStreamOperator<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>
+        SingleOutputStreamOperator<Tuple5<Integer, String, Integer, String, String>>
                 taxiTrips = source.filter(new FilterFunction<String>() {
             @Override
             // Filter trips that take less than 20 minutes.
@@ -83,14 +79,24 @@ public class LargeTrips {
                 return input.f3.atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli();
             }
         }).keyBy(0).window(TumblingEventTimeWindows.of(Time.hours(3))).reduce(new SummingReducer())
-                .filter(new FilterFunction<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>() {
-                    @Override
-                    // Once grouped, filters the registers with less than 5 trips in the 3 hour window
-                    public boolean filter(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value) {
-                        int numberOfTrips = value.f2;
-                        return numberOfTrips >= 5;
-                    }
-                });
+        .filter(new FilterFunction<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>() {
+            @Override
+            // Once grouped, filters the registers with less than 5 trips in the 3 hour window
+            public boolean filter(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value) {
+                int numberOfTrips = value.f2;
+                return numberOfTrips >= 5;
+            }
+        }).map(new MapFunction<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>, Tuple5<Integer, String, Integer, String, String>>() {
+            @Override
+            // Just to format the dates to match the PDF output
+            public Tuple5<Integer, String, Integer, String, String> map(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value) {
+                //  Pattern: 2019-06-01 00:55:13
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                return new Tuple5<Integer, String, Integer, String, String>
+                        (value.f0, value.f1.format(formatterDate), value.f2, value.f3.format(formatter), value.f4.format(formatter));
+            }
+        });
 
         // emit result
         taxiTrips.writeAsCsv(outFilePathLargeTrips, org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE).setParallelism(1);
