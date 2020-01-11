@@ -2,18 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bf17b8de-99a5-4aa9-8145-b6751116183d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/src/main/java/master2019/flink/YellowTaxiTrip/JFKAlarms.java" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/src/main/java/master2019/flink/YellowTaxiTrip/JFKAlarms.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/src/main/java/master2019/flink/YellowTaxiTrip/LargeTrips.java" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/src/main/java/master2019/flink/YellowTaxiTrip/LargeTrips.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/YellowTaxiTrip-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/YellowTaxiTrip-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/JFKAlarms.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips$3.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips$SummingReducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips$SummingReducer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips.class" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/classes/master2019/flink/YellowTaxiTrip/LargeTrips.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/YellowTaxiTrip/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/YellowTaxiTrip/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/YellowTaxiTripoutput/jfk.csv" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

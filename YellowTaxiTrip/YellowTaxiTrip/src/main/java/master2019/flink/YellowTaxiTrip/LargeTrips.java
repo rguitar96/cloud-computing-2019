@@ -3,7 +3,7 @@ package master2019.flink.YellowTaxiTrip;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
-import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -14,7 +14,9 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 
 /**
  * In this class the Large trips program has to be implemented
@@ -48,29 +50,40 @@ public class LargeTrips {
         DataStream<String> source = env.readTextFile(inputPath);
 
         //Splits the lines by commas, discards the lines with passengers under 2. Parses the String to a tuple of integers.
-        SingleOutputStreamOperator<Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>>
+        SingleOutputStreamOperator<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>
                 taxiTrips = source.filter(new FilterFunction<String>() {
             @Override
             public boolean filter(String value) {
                 String[] s = value.split(",");
-                int passengerCount = Integer.parseInt(s[3]);
-                boolean is_jfk = Integer.parseInt(s[5]) == 2;
-                return passengerCount >= 2 && is_jfk;
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime start = LocalDateTime.parse(s[1], formatter);
+                LocalDateTime end = LocalDateTime.parse(s[2], formatter);
+
+                long distanceMillis = Duration.between(start, end).toMillis();
+                long distanceMinutes = distanceMillis / (1000 * 60);
+
+                return distanceMinutes >= 20;
             }
-        }).map(new MapFunction<String, Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>>() {
+        }).map(new MapFunction<String, Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>() {
             @Override
-            public Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> map(String value) {
+            public Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> map(String value) {
                 String[] s = value.split(",");
                 //  Pattern: 2019-06-01 00:55:13
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                return new Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>(Integer.parseInt(s[0]), LocalDateTime.parse(s[1], formatter), LocalDateTime.parse(s[2], formatter), Integer.parseInt(s[3]));
+                return new Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>(Integer.parseInt(s[0]), LocalDateTime.parse(s[1], formatter).toLocalDate(), 1, LocalDateTime.parse(s[1], formatter), LocalDateTime.parse(s[2], formatter));
             }
-        }).assignTimestampsAndWatermarks(new AscendingTimestampExtractor<Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>>() {
+        }).assignTimestampsAndWatermarks(new AscendingTimestampExtractor <Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>() {
             @Override
-            public long extractAscendingTimestamp(Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> input) {
-                return input.f1.atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli();
+            public long extractAscendingTimestamp(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> input) {
+                return input.f3.atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli();
             }
-        }).keyBy(0).window(TumblingEventTimeWindows.of(Time.hours(3))).reduce(new SummingReducer());
+        }).keyBy(0).window(TumblingEventTimeWindows.of(Time.hours(3))).reduce(new SummingReducer()).filter(new FilterFunction<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>() {
+            @Override
+            public boolean filter(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value) {
+                int numberOfTrips = value.f2;
+                return numberOfTrips >= 5;
+            }
+        });
 
         // emit result
         taxiTrips.writeAsCsv(outFilePathLargeTrips, org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE).setParallelism(1);
@@ -79,11 +92,11 @@ public class LargeTrips {
         env.execute("Large Trips");
     }
 
-    private static class SummingReducer implements ReduceFunction<Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>> {
+    private static class SummingReducer implements ReduceFunction<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>> {
 
         @Override
-        public Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> reduce(Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> value1, Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> value2) {
-            return new Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>(value1.f0, value1.f1, value2.f2, value1.f3 + value2.f3);
+        public Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> reduce(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value1, Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value2) {
+            return new Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>(value1.f0, value1.f1, value1.f2 + value2.f2, value1.f3, value2.f4);
         }
     }
 }
