@@ -32,6 +32,7 @@ public class LargeTrips {
 
         // env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
+        // get input file path and output folder path
         String inputPath = "";
         String outputPath = "";
         try {
@@ -49,10 +50,10 @@ public class LargeTrips {
         String outFilePathLargeTrips = outputPath + "/largeTrips.csv";
         DataStream<String> source = env.readTextFile(inputPath);
 
-        //Splits the lines by commas, discards the lines with passengers under 2. Parses the String to a tuple of integers.
         SingleOutputStreamOperator<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>
                 taxiTrips = source.filter(new FilterFunction<String>() {
             @Override
+            // Filter trips that take less than 20 minutes.
             public boolean filter(String value) {
                 String[] s = value.split(",");
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -66,24 +67,30 @@ public class LargeTrips {
             }
         }).map(new MapFunction<String, Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>() {
             @Override
+            // Converts the String to a Tuple5 extracting the desired output data
             public Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> map(String value) {
                 String[] s = value.split(",");
                 //  Pattern: 2019-06-01 00:55:13
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                return new Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>(Integer.parseInt(s[0]), LocalDateTime.parse(s[1], formatter).toLocalDate(), 1, LocalDateTime.parse(s[1], formatter), LocalDateTime.parse(s[2], formatter));
+                return new Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>
+                        (Integer.parseInt(s[0]), LocalDateTime.parse(s[1], formatter).toLocalDate(), 1,
+                                LocalDateTime.parse(s[1], formatter), LocalDateTime.parse(s[2], formatter));
             }
-        }).assignTimestampsAndWatermarks(new AscendingTimestampExtractor <Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>() {
+        }).assignTimestampsAndWatermarks(new AscendingTimestampExtractor<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>() {
             @Override
+            // Assigns a Timestamp in order to use time windows
             public long extractAscendingTimestamp(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> input) {
                 return input.f3.atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli();
             }
-        }).keyBy(0).window(TumblingEventTimeWindows.of(Time.hours(3))).reduce(new SummingReducer()).filter(new FilterFunction<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>() {
-            @Override
-            public boolean filter(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value) {
-                int numberOfTrips = value.f2;
-                return numberOfTrips >= 5;
-            }
-        });
+        }).keyBy(0).window(TumblingEventTimeWindows.of(Time.hours(3))).reduce(new SummingReducer())
+                .filter(new FilterFunction<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>>() {
+                    @Override
+                    // Once grouped, filters the registers with less than 5 trips in the 3 hour window
+                    public boolean filter(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value) {
+                        int numberOfTrips = value.f2;
+                        return numberOfTrips >= 5;
+                    }
+                });
 
         // emit result
         taxiTrips.writeAsCsv(outFilePathLargeTrips, org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE).setParallelism(1);
@@ -93,10 +100,12 @@ public class LargeTrips {
     }
 
     private static class SummingReducer implements ReduceFunction<Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>> {
-
         @Override
-        public Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> reduce(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value1, Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value2) {
-            return new Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>(value1.f0, value1.f1, value1.f2 + value2.f2, value1.f3, value2.f4);
+        // Sums the number of trips (value1.f2 + value2.f2), gets first starting trip date (value1.f3) and gets last ending trip date (value2.f4)
+        public Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>
+        reduce(Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value1, Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime> value2) {
+            return new Tuple5<Integer, LocalDate, Integer, LocalDateTime, LocalDateTime>
+                    (value1.f0, value1.f1, value1.f2 + value2.f2, value1.f3, value2.f4);
         }
     }
 }

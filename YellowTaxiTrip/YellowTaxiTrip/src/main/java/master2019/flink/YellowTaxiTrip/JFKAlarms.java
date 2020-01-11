@@ -5,6 +5,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -31,6 +32,7 @@ public class JFKAlarms {
 
         // env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
+        // get input file path and output folder path
         String inputPath = "";
         String outputPath = "";
         try {
@@ -48,10 +50,10 @@ public class JFKAlarms {
         String outFilePathJFK = outputPath + "/jfk.csv";
         DataStream<String> source = env.readTextFile(inputPath);
 
-        //Splits the lines by commas, discards the lines with passengers under 2. Parses the String to a tuple of integers.
         SingleOutputStreamOperator<Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>>
                 taxiTrips = source.filter(new FilterFunction<String>() {
             @Override
+            // Filter trips that do not end at JFK airport and have less than two passengers.
             public boolean filter(String value) {
                 String[] s = value.split(",");
                 int passengerCount = Integer.parseInt(s[3]);
@@ -60,15 +62,18 @@ public class JFKAlarms {
             }
         }).map(new MapFunction<String, Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>>() {
             @Override
+            // Converts the String to a Tuple4 extracting the desired output data
             public Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> map(String value) {
                 String[] s = value.split(",");
                 //  Pattern: 2019-06-01 00:55:13
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                return new Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>(Integer.parseInt(s[0]), LocalDateTime.parse(s[1], formatter), LocalDateTime.parse(s[2], formatter), Integer.parseInt(s[3]));
+                return new Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>
+                        (Integer.parseInt(s[0]), LocalDateTime.parse(s[1], formatter), LocalDateTime.parse(s[2], formatter), Integer.parseInt(s[3]));
             }
         }).assignTimestampsAndWatermarks(new AscendingTimestampExtractor<Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>>() {
             @Override
             public long extractAscendingTimestamp(Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> input) {
+                // Assigns a Timestamp in order to use time windows
                 return input.f1.atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli();
             }
         }).keyBy(0).window(TumblingEventTimeWindows.of(Time.hours(1))).reduce(new SummingReducer());
@@ -81,9 +86,10 @@ public class JFKAlarms {
     }
 
     private static class SummingReducer implements ReduceFunction<Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>> {
-
         @Override
-        public Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> reduce(Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> value1, Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> value2) {
+        // Sums the number of trips (value1.f2 + value2.f2), gets first starting trip date (value1.f3) and gets last ending trip date (value2.f4)
+        public Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>
+        reduce(Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> value1, Tuple4<Integer, LocalDateTime, LocalDateTime, Integer> value2) {
             return new Tuple4<Integer, LocalDateTime, LocalDateTime, Integer>(value1.f0, value1.f1, value2.f2, value1.f3 + value2.f3);
         }
     }
