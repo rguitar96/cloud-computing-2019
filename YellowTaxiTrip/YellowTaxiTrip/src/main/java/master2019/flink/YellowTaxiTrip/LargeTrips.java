@@ -43,7 +43,7 @@ public class LargeTrips {
         if (params.get("input").charAt(0) != '/') inputPath = System.getProperty("user.dir") + "/" + inputPath;
         if (params.get("output").charAt(0) != '/') outputPath = System.getProperty("user.dir") + "/" + outputPath;
 
-        String outFilePathLargeTrips = outputPath + "/largeTrips.csv";
+        //String outFilePathLargeTrips = outputPath + "/largeTrips.csv";
         DataStream<String> source = env.readTextFile(inputPath);
 
         SingleOutputStreamOperator<Tuple5<Integer, String, Integer, String, String>>
@@ -99,7 +99,7 @@ public class LargeTrips {
         });
 
         // emit result
-        taxiTrips.writeAsCsv(outFilePathLargeTrips, org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE).setParallelism(1);
+        taxiTrips.writeAsCsv(outputPath, org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE).setParallelism(1);
 
         // execute program
         env.execute("Large Trips");

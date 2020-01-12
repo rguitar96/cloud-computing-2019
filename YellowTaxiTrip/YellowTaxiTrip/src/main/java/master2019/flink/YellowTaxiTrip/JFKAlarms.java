@@ -43,7 +43,7 @@ public class JFKAlarms {
         if (params.get("input").charAt(0) != '/') inputPath = System.getProperty("user.dir") + "/" + inputPath;
         if (params.get("output").charAt(0) != '/') outputPath = System.getProperty("user.dir") + "/" + outputPath;
 
-        String outFilePathJFK = outputPath + "/jfkAlarms.csv";
+        //String outFilePathJFK = outputPath + "/jfkAlarms.csv";
         DataStream<String> source = env.readTextFile(inputPath);
 
         SingleOutputStreamOperator<Tuple4<Integer, String, String, Integer>>
@@ -85,7 +85,7 @@ public class JFKAlarms {
         });
 
         // emit result
-        taxiTrips.writeAsCsv(outFilePathJFK, org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE).setParallelism(1);
+        taxiTrips.writeAsCsv(outputPath, org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE).setParallelism(1);
 
         // execute program
         env.execute("JFK");
